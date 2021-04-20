@@ -1,0 +1,4 @@
+sympy==1.7.1
+azure-identity
+azure-keyvault-secrets
+python-binance
