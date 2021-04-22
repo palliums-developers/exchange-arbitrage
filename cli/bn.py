@@ -26,7 +26,7 @@ class Client:
                             price=price,
                             quantity=amount)
 
-    def buy(self, currency_code, amount, price=None):
+    def buy(self, currency_code, amount, price=None, blocking=True):
         if price is None:
             price = self.get_sell_price(currency_code)*0.995
         pair_name = self.get_pair_name(currency_code)
@@ -36,6 +36,15 @@ class Client:
                             type=self._client.ORDER_TYPE_MARKET,
                             price=price,
                             quantity=amount)
+
+    def close_buy(self, currency_code):
+        pass
+
+    def close_sell(self, currency_code):
+        pass
+
+    def repay_borrow(self, currency_code):
+        pass
 
     def test_sell(self, currency_code, amount):
         pair_name = self.get_pair_name(currency_code)
@@ -53,7 +62,7 @@ class Client:
                             type=self._client.ORDER_TYPE_MARKET,
                             quantity=amount)
 
-    def withdraw(self, currency_code, amount, addr):
+    def withdraw(self, currency_code, addr=None, amount=None, blocking=True):
         pass
 
     def get_buy_trade_fee(self, currency_code):

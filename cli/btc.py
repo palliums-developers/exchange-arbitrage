@@ -46,7 +46,6 @@ class Client:
                 "address": self._ac.address,
                 "value": sum-amount
             })
-        print(fee)
         tx = self.create_tx(inputs, outs)
         signed_tx = self._btc.signall(tx, self._ac.private_key)
         return self.send_transction(signed_tx)
@@ -54,19 +53,22 @@ class Client:
     def to_violas(self, amount, violas_addr, chain_id):
         amount = self._from_standard_amount(amount)
         fee = self.estimate_fee()
+        fee = self._from_standard_amount(fee)
         utxos = self.get_utxo(self._ac.address)
-        sum, inputs = self.get_inputs(amount+fee, utxos)
+        sum, inputs = self.get_inputs(amount, utxos)
         outs = [{
             "address": b2v_addr,
-            "value": amount
-        },{
-            "address": self._ac.address,
-            "value": sum - amount - fee
+            "value": amount-fee
         },{
             "script": gen_b2v_data(violas_addr, chain_id),
             "value": 0
         }
         ]
+        if sum - amount > 0:
+            outs.append({
+                "address": self._ac.address,
+                "value": sum - amount
+            })
         tx = self.create_tx(inputs, outs)
         signed_tx = self._btc.signall(tx, self._ac.private_key)
         return self.send_transction(signed_tx)
@@ -122,9 +124,11 @@ class Client:
             lambda :self.execute("estimatefee", [block_height]).get("result")
         ))
 
-    def estimate_tx_fee(self, from_addr, amount, block_height=1):
+    def estimate_tx_fee(self, from_addr=None, amount=None, block_height=1):
+        if from_addr is None:
+            return self.estimate_fee(block_height)
         utxos = self.get_utxo(from_addr)
-        inputs = self.get_inputs(amount, utxos)
+        _, inputs = self.get_inputs(amount, utxos)
         return ((148 * len(inputs) + 34*2 + 10) // 1000+1)*self.estimate_fee(block_height)
 
     def execute(self, method, params):

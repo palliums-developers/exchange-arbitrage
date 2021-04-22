@@ -16,6 +16,10 @@ class Client:
         self._cli = VClient.new(url=VLS_RPC_URL)
         self._ac = Account(bytes.fromhex(get_vls_priv_key()))
 
+    @property
+    def chain_id(self):
+        return self._cli.chain_id
+
     def to_btc(self, baddr, amount):
         amount = self._from_standard_amount(amount)
         data = gen_v2b_data(baddr)
@@ -39,6 +43,12 @@ class Client:
         self._cli.bank_borrow2(self._ac, amount, currency_code)
         return self._cli.swap(self._ac, currency_code, self.USDT, amount)
 
+    def close_buy(self):
+        return self.repay_borrow(self.USDT)
+
+    def close_sell(self, currency_code):
+        return self.repay_borrow(currency_code)
+
     def repay_borrow(self, currency_code):
         balance = self._cli.get_balance(self._ac.address, currency_code)
         borrows = self._cli.bank_get_borrow_amount(self._ac.address, currency_code)[1]
@@ -48,7 +58,7 @@ class Client:
         self._cli.bank_repay_borrow2(self._ac, amount, currency_code)
 
     def get_balance(self, currency_code):
-        return self._cli.get_balance(self._ac.address, currency_code)
+        return self._to_standard_amount(self._cli.get_balance(self._ac.address, currency_code))
 
     def get_chain_id(self):
         return self._cli.chain_id
@@ -70,7 +80,7 @@ class Client:
     def get_amount_in(self, currency_in, currency_out, amount_out):
         amount_out = self._from_standard_amount(amount_out)
         amount = self._cli.swap_get_swap_input_amount(currency_in, currency_out, amount_out)[0]
-        return int(amount)
+        return self._to_standard_amount(amount)
 
     def get_price(self, currency_code):
         resources = self._cli.swap_get_reserves_resource()

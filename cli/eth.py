@@ -20,10 +20,10 @@ class Client:
         token_addr, abi = self._get_contract_info(token)
         contract = self._w3.eth.contract(token_addr, abi=abi)
         amount = contract.functions.balanceOf(addr).call()
-        return self._to_standard_amount(amount)
+        return self._to_standard_amount(amount, token)
 
     def transfer(self, to_addr, token, amount):
-        amount = self._from_standard_amount(amount)
+        amount = self._from_standard_amount(amount, token)
         token = self._to_standard(token)
         if token == "eth":
             tx = self._create_eth_tx(self._ac, to_addr, amount)
@@ -34,7 +34,7 @@ class Client:
         return tx_hash
 
     def to_violas(self, violas_addr, token, amount):
-        amount = self._from_standard_amount(amount)
+        amount = self._from_standard_amount(amount, token)
         token = self._to_standard(token)
         token_addr, _ = self._get_contract_info(token)
         allownce = self.call_method(token, "allowance", self._ac.address, self._e2v_addr)
@@ -45,7 +45,8 @@ class Client:
         return self.exec_method(e2v_token, "transferProof", token_addr, violas_addr)
 
     def estimate_transaction_fee(self):
-        return self._w3.eth.estimateGas({"from": self._e2v_addr}) * self._w3.eth.gasPrice
+        amount = self._w3.eth.estimateGas({"from": self._e2v_addr}) * self._w3.eth.gasPrice
+        return self._to_standard_amount(amount, "eth")
 
     def exec_method(self, token, method, *args):
         token = self._to_standard(token)
@@ -95,11 +96,17 @@ class Client:
     def _to_standard(self, token):
         return token.lower()
 
-    def _to_standard_amount(self, amount):
-        return amount / 10**6
+    def _to_standard_amount(self, amount, token):
+        if token == "vlstusdt":
+            return amount / 10**6
+        if token == "eth":
+            return amount / 10**18
 
-    def _from_standard_amount(self, amount):
-        return int(amount*10**6)
+    def _from_standard_amount(self, amount, token):
+        if token == "vlstusdt":
+            return int(amount*10**6)
+        if token == "eth":
+            return int(amount*10**18)
 
 
 
