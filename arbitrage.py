@@ -58,7 +58,7 @@ class Arbitrage:
         '''bn卖出currency code给出的usdt'''
         out_usdt = self._bncli.get_sell_value(currency_code, amount)
         gas_fee = self.estimate_v2bn_gas_fee()
-        print(f"卖出给予{out_usdt}usdt, 买入需要{in_usdt}usdt, gas_fee:{gas_fee}, amount:{amount}")
+        # print(f"卖出给予{out_usdt}usdt, 买入需要{in_usdt}usdt, gas_fee:{gas_fee}, amount:{amount}")
         if out_usdt - in_usdt - gas_fee > self.MIN_PROFIT:
             return True
         return False
@@ -71,7 +71,7 @@ class Arbitrage:
         '''bn购买currency_code需要的usdt'''
         in_usdt = self._bncli.get_buy_value(currency_code, amount)
         gas_fee = self.estimate_bn2v_gas_fee()
-        print(f"卖出给予{out_usdt}usdt, 买入花费{in_usdt}usdt, gas_fee:{gas_fee}, amount:{amount}")
+        # print(f"卖出给予{out_usdt}usdt, 买入花费{in_usdt}usdt, gas_fee:{gas_fee}, amount:{amount}")
         if out_usdt - in_usdt - gas_fee > self.MIN_PROFIT:
             return True
         return False
@@ -109,7 +109,8 @@ class Arbitrage:
                 self._bncli.sell(currency_code, amount)
                 print(f"violas买入{amount}{currency_v}, bn卖出{amount}{currency_code}")
                 self._v2bn(currency_code)
-                self._bn2v(self.USDT)
+                u_amount = self._bncli.get_price(currency_code)*amount
+                self._bn2v(self.USDT, u_amount)
                 self._vcli.close_buy()
                 self._bncli.close_sell(currency_code)
 
@@ -176,6 +177,9 @@ class Arbitrage:
 
         if amount is None:
             amount = self._ecli.get_balance(usdt_e)
+        else:
+            u_amount = self._ecli.get_balance(usdt_e)
+            amount = min(u_amount, amount)
         v_start = self._vcli.get_balance(usdt_v)
         self._ecli.to_violas(to_addr, usdt_e, amount)
         if blocking:
@@ -220,13 +224,14 @@ class Arbitrage:
                     break
         print("v2e", amount)
 
-    def _bn2v(self, currency_code, blocking=True):
-        amount = self._bncli.get_amount(currency_code)
+    def _bn2v(self, currency_code, amount=None, blocking=True):
+        if amount is None:
+            amount = self._bncli.get_amount(currency_code)
         self._bncli.withdraw(currency_code, amount=amount, blocking=blocking)
         if currency_code == self.BTC:
             self._b2v(blocking=blocking)
         elif currency_code == self.USDT:
-            self._e2v(blocking=blocking)
+            self._e2v(amount=amount, blocking=blocking)
 
     def _v2bn(self, currency_code, blocking=True):
         if currency_code == self.USDT:

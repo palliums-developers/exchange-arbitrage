@@ -1,9 +1,8 @@
 import time
-from network import create_client
-from arbitrage import exchange_arbitrage
+from arbitrage import Arbitrage
 
-client = create_client()
+arbitrage = Arbitrage()
 while True:
-    exchange_arbitrage(client)
+    arbitrage.try_arbitrage("BTC")
     time.sleep(30)
     print("...............")

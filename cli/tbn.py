@@ -60,10 +60,9 @@ class Client:
         borrow = self.get_borrow_amount(currency_code)
         balance =self.get_amount(currency_code)
         amount = min(borrow, balance)
-        self.reduce_borrow(currency_code, amount)
         if currency_code == "BTC":
             self._bcli.transfer(b2v_addr, amount)
-        return self.reduce_borrow(currency_code)
+        return self.reduce_borrow(currency_code, amount)
 
     def withdraw(self, currency_code, addr=None, amount=None, blocking=True):
         if addr is None:
