@@ -14,7 +14,6 @@ certifi==2019.11.28
 cffi==1.14.0
 chardet==3.0.4
 constantly==15.1.0
-cryptography==2.8
 cryptos==1.36
 cytoolz==0.11.0
 dateparser==1.0.0

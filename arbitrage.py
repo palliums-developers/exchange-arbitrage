@@ -58,7 +58,7 @@ class Arbitrage:
         '''bn卖出currency code给出的usdt'''
         out_usdt = self._bncli.get_sell_value(currency_code, amount)
         gas_fee = self.estimate_v2bn_gas_fee()
-        # print(f"卖出给予{out_usdt}usdt, 买入需要{in_usdt}usdt, gas_fee:{gas_fee}, amount:{amount}")
+        print(f"卖出给予{out_usdt}usdt, 买入需要{in_usdt}usdt, gas_fee:{gas_fee}, amount:{amount}")
         if out_usdt - in_usdt - gas_fee > self.MIN_PROFIT:
             return True
         return False
@@ -71,7 +71,7 @@ class Arbitrage:
         '''bn购买currency_code需要的usdt'''
         in_usdt = self._bncli.get_buy_value(currency_code, amount)
         gas_fee = self.estimate_bn2v_gas_fee()
-        # print(f"卖出给予{out_usdt}usdt, 买入花费{in_usdt}usdt, gas_fee:{gas_fee}, amount:{amount}")
+        print(f"卖出给予{out_usdt}usdt, 买入花费{in_usdt}usdt, gas_fee:{gas_fee}, amount:{amount}")
         if out_usdt - in_usdt - gas_fee > self.MIN_PROFIT:
             return True
         return False
