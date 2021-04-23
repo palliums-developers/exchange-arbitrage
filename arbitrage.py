@@ -7,7 +7,7 @@ from cli.tbn import Client as BNTClient
 from network import *
 
 class Arbitrage:
-    MIN_PROFIT = 10
+    MIN_PROFIT = 1
     USDT = "USDT"
     BTC = "BTC"
     ETH = "ETH"

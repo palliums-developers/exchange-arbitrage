@@ -4,7 +4,7 @@ from cli.vls import Client as VClient
 cli = Client("violas_testnet")
 
 currency_code = "vBTC"
-to_price = 30000
+to_price = 1000
 v_cli = VClient()
 amount = v_cli.get_amount_to_price(currency_code=currency_code, to_price=to_price)
 print(amount)
