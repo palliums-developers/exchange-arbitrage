@@ -3,7 +3,7 @@ from network import eth_url_prefix, contracts, e2v_token, get_eth_pri_key
 
 class Client:
 
-    WAIT_TRANSATION_TIMEOUT = 1_000_000_000
+    WAIT_TRANSATION_TIMEOUT = 120
 
     def __init__(self):
         self._w3 = Web3(Web3.HTTPProvider(eth_url_prefix))
