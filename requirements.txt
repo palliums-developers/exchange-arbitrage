@@ -28,7 +28,6 @@ eth-keys==0.3.3
 eth-rlp==0.2.1
 eth-typing==2.2.2
 eth-utils==1.10.0
-fmz==1.2
 grpcio==1.27.2
 hexbytes==0.2.1
 hyperlink==21.0.0
