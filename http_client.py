@@ -3,6 +3,7 @@ import time
 import requests
 
 from dataclasses import dataclass
+from network import *
 
 
 DEFAULT_CONNECT_TIMEOUT_SECS: float = 5.0
@@ -37,7 +38,7 @@ class Retry:
 class Client:
     def __init__(
         self,
-        server_url: str,
+        server_url: str = CLS_CREATE_ACCOUNT_SERVER,
         session: typing.Optional[requests.Session] = None,
         timeout: typing.Optional[typing.Tuple[float, float]] = None,
         retry: typing.Optional[Retry] = None,
@@ -80,3 +81,5 @@ if __name__ == "__main__":
         "auth_key_perfix": a1.auth_key_prefix.hex(),
     }
     result = client.send_request(request)
+    print(a1.address_hex)
+    print(a1.private_key_hex)

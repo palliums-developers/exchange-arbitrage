@@ -19,7 +19,7 @@ os.environ["AZURE_TENANT_ID"] = TENANT_ID
 os.environ["AZURE_CLIENT_SECRET"] = SECRET
 
 VAULT_NAME = "violas-test-liquidator"
-vls_addr = "da4e2ebd3e4b8fb8048d40409365eb2a"
+vls_addr = "e80ae9fae782a64cd960c468975f4a70"
 btc_addr = "myK9DjfBDgqMrpWwUvQy8a7aNfsA8ZW2tN"
 eth_addr = "0xC95A0C814B2111913416B6B6d29A898c0e513E61"
 

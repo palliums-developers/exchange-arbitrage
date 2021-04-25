@@ -10,8 +10,6 @@ from violas_client import Client
 from web3 import Web3
 
 
-# bn = TBNClient()
-# bn.sell("BTC", 0.005)
 
 vcli = VClient()
 vcli.test_repay_borrow("vBTC")
