@@ -1,3 +1,4 @@
+from .util import Retry
 from web3 import Web3
 from network import eth_url_prefix, contracts, e2v_token, get_eth_pri_key
 
@@ -10,8 +11,10 @@ class Client:
         self._contracts = contracts
         self._e2v_addr, self._e2v_abi = self._get_contract_info(e2v_token)
         self._ac = self._w3.eth.account.from_key(get_eth_pri_key())
+        self._retry = Retry()
 
-    def get_balance(self, token, addr=None):
+
+    def _get_balance(self, token, addr=None):
         token = token.lower()
         if addr is None:
             addr = self._ac.address
@@ -21,6 +24,11 @@ class Client:
         contract = self._w3.eth.contract(token_addr, abi=abi)
         amount = contract.functions.balanceOf(addr).call()
         return self._to_standard_amount(amount, token)
+
+    def get_balance(self, token, addr=None):
+        return self._retry.execute(
+            lambda :self._get_balance(token, addr)
+        )
 
     def transfer(self, to_addr, token, amount):
         amount = self._from_standard_amount(amount, token)
@@ -44,9 +52,14 @@ class Client:
         self.exec_method(token, "approve", self._e2v_addr, amount)
         return self.exec_method(e2v_token, "transferProof", token_addr, violas_addr)
 
-    def estimate_transaction_fee(self):
+    def _estimate_transaction_fee(self):
         amount = self._w3.eth.estimateGas({"from": self._e2v_addr}) * self._w3.eth.gasPrice
         return self._to_standard_amount(amount, "eth")
+
+    def estimate_transaction_fee(self):
+        return self._retry.execute(
+            lambda : self._estimate_transaction_fee()
+        )
 
     def exec_method(self, token, method, *args):
         token = self._to_standard(token)
@@ -55,11 +68,16 @@ class Client:
         self._w3.eth.waitForTransactionReceipt(tx_hash, self.WAIT_TRANSATION_TIMEOUT)
         return tx_hash
 
-    def call_method(self, token, method, *args):
+    def _call_method(self, token, method, *args):
         token = self._to_standard(token)
         token_addr, abi = self._get_contract_info(token)
         contract = self._w3.eth.contract(token_addr, abi=abi)
         return getattr(contract.functions, method)(*args).call()
+
+    def call_method(self, token, method, *args):
+        return self._retry.execute(
+            lambda :self._call_method(token, method, *args)
+        )
 
     def _create_eth_tx(self, ac, to_addr, amount):
         raw_tx = dict(
