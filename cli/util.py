@@ -30,9 +30,9 @@ class Retry:
             except self.exception as e:
                 if tries < self.max_retries:
                     # simplest backoff strategy: tries * delay
-                    time.sleep(self.delay_secs * tries)
+                    time.sleep(self.delay_secs)
                 else:
-                    raise e
+                    raise NetWorkError(str(e))
 
 
 def gen_b2v_data(payee, chain_id):
